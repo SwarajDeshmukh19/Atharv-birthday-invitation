@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Invitation Envelope</title>
+  <link rel="stylesheet" href="./envelope-style.css"> <!-- External CSS -->
+  <style>
+    @media (max-width: 768px) {
+      .envelope {
+        width: 90vw;
+        height: auto;
+        aspect-ratio: 3 / 2;
+      }
+
+      .card {
+        height: 70%;
+        top: 15%;
+      }
+
+      .open-text {
+        font-size: 1rem;
+      }
+
+      .close-btn {
+        display: none;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #ff4c4c;
+        color: white;
+        font-size: 1rem;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 10;
+        transition: background-color 0.3s;
+      }
+
+      .close-btn:hover {
+        background-color: #e04c4c;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="envelope-container">
+    <div class="envelope">
+      <div class="flap top-flap">
+        <div class="open-text">Open Me 🎈</div>
+      </div>
+      <div class="card">
+        <iframe src="./birthday-invitation.html" frameborder="0"></iframe>
+      </div>
+      <div class="flap bottom-flap"></div>
+    </div>
+
+    <!-- Close button OUTSIDE the envelope, but inside the container -->
+    <button class="close-btn">Close ✨</button>
+  </div>
+
+  <audio id="flapSound" src="flap.mp3" preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const envelope = document.querySelector('.envelope');
+    const flapSound = document.getElementById('flapSound');
+    const closeBtn = document.querySelector('.close-btn');
+    const container = document.querySelector('.envelope-container');
+    let hasPopped = false;
+    let isOpen = false;
+    const isMobile = window.innerWidth <= 768;
+
+    function openEnvelope() {
+      envelope.classList.add('opened');
+      flapSound.currentTime = 0;
+      flapSound.play();
+
+      if (!hasPopped) {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.4 }
+        });
+        hasPopped = true;
+        setTimeout(() => hasPopped = false, 2000);
+      }
+
+      closeBtn.style.display = 'block';
+      isOpen = true;
+    }
+
+    function closeEnvelope() {
+      envelope.classList.remove('opened');
+      closeBtn.style.display = 'none';
+      isOpen = false;
+    }
+
+    if (isMobile) {
+      container.addEventListener('click', (e) => {
+        if (e.target === closeBtn) return; // Let the button handle it
+
+        if (!isOpen) {
+          openEnvelope();
+        } else {
+          closeEnvelope();
+        }
+      });
+
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeEnvelope();
+      });
+    } else {
+      envelope.addEventListener('mouseenter', () => {
+        if (!isOpen) openEnvelope();
+      });
+
+      closeBtn.style.display = 'none'; // Hide close on desktop
+    }
+  </script>
+</body>
+</html>
